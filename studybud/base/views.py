@@ -1,7 +1,34 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 from django.db.models import Q
 from .models import Room, Topic
 from .forms import RoomForm
+
+
+def loginPage(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        try:
+            user = User.objects.get(username=username)
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+            else:
+                messages.error(request, 'Incorrect password')
+        except:
+            messages.error(request, 'User does not exist')
+
+    context = {}
+    return render(request, 'base/login_page.html', context)
+
+
+def logoutUser(request):
+    logout(request)
+    return redirect('home')
 
 
 def home(request):
@@ -43,7 +70,7 @@ def updateRoom(request, pk):
     form = RoomForm(instance=room)
 
     if request.method == 'POST':
-        form = RoomForm(request.POST, instance=room) # instance is used to update the existing record
+        form = RoomForm(request.POST, instance=room)  # instance is used to update the existing record
         if form.is_valid():
             form.save()
             return redirect('home')
@@ -60,4 +87,3 @@ def deleteRoom(request, pk):
         return redirect('home')
 
     return render(request, 'base/delete.html', {'obj': room})
-
