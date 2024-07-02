@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +11,8 @@ from .forms import RoomForm
 
 
 def loginPage(request):
+    page = 'login'
+
     if request.user.is_authenticated:
         return redirect('home')
 
@@ -27,13 +30,35 @@ def loginPage(request):
         except:
             messages.error(request, 'User does not exist')
 
-    context = {}
-    return render(request, 'base/login_page.html', context)
+    context = {'page': page}
+    return render(request, 'base/login_registration.html', context)
 
 
 def logoutUser(request):
     logout(request)
     return redirect('home')
+
+
+def registerPage(request):
+    form = UserCreationForm()
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username').lower()
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Username already exists')
+            else:
+                user = form.save(commit=False)
+                user.username = username
+                user.save()
+                login(request, user)
+                return redirect('login')
+        else:
+            messages.error(request, 'Form is not valid')
+
+    context = {'form': form}
+    return render(request, 'base/login_registration.html', context)
 
 
 def home(request):
