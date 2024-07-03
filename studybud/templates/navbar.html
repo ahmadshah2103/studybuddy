@@ -1,16 +1,36 @@
-<a href="/">LOGO</a>
+<style>
+    .navbar-container {
+        display: grid;
+        grid-template-columns: 1fr 3fr 1fr;
+    }
+</style>
 
-<form method="GET" action="{% url 'home' %}">
-    <input type="text" name="q" placeholder="Search">
-</form>
+<div class="navbar-container">
+    <div>
+        <a href="/">LOGO</a>
+    </div>
 
-{% if request.user.is_authenticated %}
-    <button>
-        <a href="{% url 'logout' %}">Logout</a>
-    </button>
-{% else %}
-    <button>
-        <a href="{% url 'login' %}">Login</a>
-    </button>
-{% endif %}
+    <div>
+        <form method="GET" action="{% url 'home' %}">
+            <input type="text" name="q" placeholder="Search">
+        </form>
+    </div>
+
+    <div>
+        {% if request.user.is_authenticated %}
+            <small>Hello {{ request.user }}</small>
+        {% endif %}
+    
+        {% if request.user.is_authenticated %}
+            <button>
+                <a href="{% url 'logout' %}">Logout</a>
+            </button>
+        {% else %}
+            <button>
+                <a href="{% url 'login' %}">Login</a>
+            </button>
+        {% endif %}
+    </div>
+</div>
+
 <hr>
