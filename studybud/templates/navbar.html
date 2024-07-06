@@ -24,7 +24,7 @@
                 <div class="header__user">
                     <a href="{% url 'user-profile' request.user.id %}">
                         <div class="avatar avatar--medium active">
-                            <img src="https://randomuser.me/api/portraits/men/37.jpg"/>
+                            <img src="{{ request.user.avatar.url }}"/>
                         </div>
                         <p>{{ request.user.username }}<span>@{{ request.user.username }}</span></p>
                     </a>
@@ -39,7 +39,7 @@
             {% else %}
                 <!-- Not Logged In -->
                 <a href="{% url 'login' %}">
-                    <img src="{% static 'images/assets/avatar.svg' %}"/>
+                    <img src="{% static 'images/assets/../static/images/avatar.svg' %}"/>
                     <p>Login</p>
                 </a>
             {% endif %}

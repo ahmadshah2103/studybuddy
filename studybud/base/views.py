@@ -1,13 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.db.models import Q
-from .models import Room, Topic, Message
-from .forms import RoomForm, UserForm
+from .models import Room, Topic, Message, User
+from .forms import RoomForm, UserForm, MyUserCreationForm
 
 
 def loginPage(request):
@@ -17,10 +15,10 @@ def loginPage(request):
         return redirect('home')
     
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
-        if User.objects.filter(username=username).exists():
-            user = authenticate(request, username=username, password=password)
+        if User.objects.filter(email=email).exists():
+            user = authenticate(request, email=email, password=password)
             if user is not None:
                 login(request, user)
                 return redirect('home')
@@ -39,10 +37,10 @@ def logoutUser(request):
 
 
 def registerPage(request):
-    form = UserCreationForm()
+    form = MyUserCreationForm()
     
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = MyUserCreationForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username').lower()
             if User.objects.filter(username=username).exists():
@@ -108,11 +106,13 @@ def userProfile(request, pk):
     rooms = user.room_set.all()
     room_messages = user.message_set.all()
     topics = Topic.objects.all()
+    total_rooms = Room.objects.all().count()
     
     context = {
         'user': user,
         'rooms': rooms,
         'topics': topics,
+        'total_rooms': total_rooms,
         'room_messages': room_messages
     }
     return render(request, 'base/user_profile.html', context)
@@ -199,7 +199,7 @@ def updateUser(request):
     form = UserForm(instance=user)
     
     if request.method == 'POST':
-        form = UserForm(request.POST, instance=user)
+        form = UserForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
         else:
