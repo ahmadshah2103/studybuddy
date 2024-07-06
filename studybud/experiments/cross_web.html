@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cross Web</title>
+</head>
+<body>
+<h1>Cross Web</h1>
+
+<div id="rooms_conatainer">
+
+
+</div>
+
+</body>
+
+<script>
+    let rooms_container = document.getElementById('rooms_conatainer');
+
+    let getRoom = async () => {
+        let response = await fetch ('http://127.0.0.1:8000/api/rooms/');
+        let rooms = await response.json();
+
+        console.log("Response:", rooms)
+
+        for(let i = 0; i < rooms.length; i++) {
+            let room = rooms[i];
+            let room_div = document.createElement('div');
+            room_div.innerHTML = room.name;
+            rooms_container.appendChild(room_div);
+        }
+    }
+
+    getRoom();
+</script>
+
+</html>
